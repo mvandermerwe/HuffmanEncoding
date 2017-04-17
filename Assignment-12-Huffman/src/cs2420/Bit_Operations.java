@@ -62,14 +62,24 @@ public final class Bit_Operations
 
 	public static byte[] get_bytes ( BitSet bits )
 	{
-		
 		// 1) Create a new bit set: RESULT
 		// 2) for every bit in the bit set
 		//       if divisible by 8 we are at a new byte, so remember this fact
 		//       if the bit is true, set the appropriate bit in RESULT 
 		// 3) return a byte array from the RESULT 
-
-		return null; // FIXME
+		BitSet result = new BitSet(bits.length());
+		int largeBucket = ((bits.length() - 1) / 8) + 1;
+		int smallBucket = ((bits.length() - 1) / 8);
+		int bucket = bits.length() - 1 == smallBucket ? smallBucket : largeBucket;
+		for(int bucketIndex = bucket; bucketIndex > 0; bucketIndex--){
+			for(int bitOffset = 0; bitOffset < 8; bitOffset++){
+				if(bits.get((bucketIndex * 8) - 1 - bitOffset)){
+					result.set((bucketIndex - 1) * 8 + bitOffset);
+					
+				}
+			}
+		}
+		return result.toByteArray();
 	}
 
 	/**
@@ -106,7 +116,7 @@ public final class Bit_Operations
 	 */
 	public static boolean get_bit( byte the_byte, int position)
 	{
-		return false; // FIXME!
+		return ((0b0000_0001 << (7 - position)) & the_byte) != 0;
 	}
 
 }
