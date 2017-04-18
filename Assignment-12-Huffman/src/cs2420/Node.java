@@ -47,6 +47,8 @@ class Node implements Comparable<Node> {
 		// Set children.
 		this.left = left;
 		this.right = right;
+		
+		this.frequency = this.left.frequency + this.right.frequency;
 	}
 
 	/**
