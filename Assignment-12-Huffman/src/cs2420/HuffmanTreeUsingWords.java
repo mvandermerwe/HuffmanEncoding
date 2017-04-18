@@ -132,9 +132,9 @@ public class HuffmanTreeUsingWords {
 			Hashtable<String, Node> symbols = new Hashtable<>();
 
 			symbols = read_file_header_with_symbol_frequencies(byte_buffer); // builds
-																				// symbol
-																				// frequency
-																				// table
+			// symbol
+			// frequency
+			// table
 
 			if (VERBOSE_FILE_SIZE) {
 				System.out.println("");
@@ -377,7 +377,7 @@ public class HuffmanTreeUsingWords {
 			{
 				current_symbol += ch;
 			} else // a non letter (thus marking the division between possible
-					// word symbols
+				// word symbols
 			{
 				// 1) if we have started to build a word
 				if (current_symbol.length() > 0) {
@@ -581,11 +581,37 @@ public class HuffmanTreeUsingWords {
 	 */
 	static Node create_tree(Collection<Node> nodes) {
 
-		// FIXME
+		//make a priority queue that will contain the words and symbols
+		PriorityQueue<Node> allWordsAndSymbols = new PriorityQueue<>(new Comparator<Node>(){
+			
+			//make our own comparator so that max heap becomes a min heap
+			@Override
+			public int compare(Node node1, Node node2) {
+				return node2.get_frequency() - node1.get_frequency();
+			}
 
-		// if ( VERBOSE_PRINT_TREE ) { System.out.println( root.createDot()); }
+		});
+		
+		//add all the words and symbols given in the collection
+		allWordsAndSymbols.addAll(nodes);
+		//while the priority queue still has at least more than one keep combining them nodes
+		while(allWordsAndSymbols.size() > 1){
+			//remove the two least common words or symbols and combine them into a node
+			Node least = allWordsAndSymbols.remove();
+			Node secondLeast = allWordsAndSymbols.remove();
+			Node combinedNodes = new Node(null, least, secondLeast);
+			//add the combined words and/or symbols to the priority queue again
+			allWordsAndSymbols.add(combinedNodes);
+		}
 
-		return null; // FIXME: root;
+		//set the root by pulling out the only thing in the priority queue
+		Node root = allWordsAndSymbols.remove();
+
+		if ( VERBOSE_PRINT_TREE ) { 
+			System.out.println( root.createDot()); 
+		}
+
+		return root;
 
 	}
 
