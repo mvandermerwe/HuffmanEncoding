@@ -15,7 +15,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -377,7 +376,7 @@ public class HuffmanTreeUsingWords {
 			{
 				current_symbol += ch;
 			} else // a non letter (thus marking the division between possible
-				// word symbols
+					// word symbols
 			{
 				// 1) if we have started to build a word
 				if (current_symbol.length() > 0) {
@@ -454,7 +453,7 @@ public class HuffmanTreeUsingWords {
 	 * LENGTH, SYMBOL, FREQUENCY (repeated for all symbols) ZERO (so we know we
 	 * are out of symbols - okay because a length of 0 doesn't make sense)
 	 * 
-	 * 4) EXAMPE (for the following symbols and frequencies: (a,5) (hello,10),
+	 * 4) EXAMPLE (for the following symbols and frequencies: (a,5) (hello,10),
 	 * (EOF,1)
 	 * 
 	 * 1a5, 5hello10, 3EOF1 (note: there of course are no spaces or commas and
@@ -471,29 +470,34 @@ public class HuffmanTreeUsingWords {
 		int count = 0;
 
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		;
 
 		if (VERBOSE_ENCODING_TREE) {
 			System.out.printf("------------ encoding table (ordered by frequency) ------------\n");
 		}
 
-		// FIXME: build the header bytes
-		// Note: you will want to use the convert_integer_to_bytes method
-		// you will want to use the out.write method
-		//
-		// pseudo code
 		// for every node in the list of huffman_nodes
-		// write the length of the symbol (to the out variable)
-		// write the symbol itself
-		// write the frequency
-		// write a close 0
-		// covert out into a byte array and return it.
+		for (Node symbol : huffman_nodes) {
+			// write the length of the symbol (to the out variable)
+			out.write(convert_integer_to_bytes(symbol.get_symbol().length()));
+			
+			// write the symbol itself
+			out.write(symbol.get_symbol().getBytes());
+			
+			// write the frequency
+			out.write(convert_integer_to_bytes(symbol.get_frequency()));
+			
+			// write a close 0
+			out.write(0);
+			
+			count++;
+		}
 
 		if (VERBOSE_ENCODING_TREE) {
 			System.out.println("\n\tEncoding Table Size:  " + count + " bytes");
 		}
 
-		return null; // FIXME
+		// convert out into a byte array and return it.
+		return out.toByteArray();
 
 	}
 
@@ -553,7 +557,17 @@ public class HuffmanTreeUsingWords {
 					"Building bit representation of each symbol for " + ordered_list_of_symbols.size() + " symbols");
 		}
 
-		// FIXME
+		// For each symbol in our list..
+		for(String symbol: ordered_list_of_symbols) {
+			// Get the corresponding node.
+			Node symbolNode = table.get(symbol);
+			// Determine the bit pattern for the symbol.
+			LinkedList<Integer> symbolCode = determine_bit_pattern_for_symbol(symbolNode);
+			// Add each part of the code to the bitset.
+			for(Integer codePart: symbolCode) {
+				bitset.set(codePart);
+			}
+		}
 
 		if (VERBOSE_PRINT_SYMBOL_BITS) {
 			System.out.println("\n----------- done --------------");
@@ -581,34 +595,36 @@ public class HuffmanTreeUsingWords {
 	 */
 	static Node create_tree(Collection<Node> nodes) {
 
-		//make a priority queue that will contain the words and symbols
-		PriorityQueue<Node> allWordsAndSymbols = new PriorityQueue<>(new Comparator<Node>(){
-			
-			//make our own comparator so that max heap becomes a min heap
+		// make a priority queue that will contain the words and symbols
+		PriorityQueue<Node> allWordsAndSymbols = new PriorityQueue<>(new Comparator<Node>() {
+
+			// make our own comparator so that max heap becomes a min heap
 			@Override
 			public int compare(Node node1, Node node2) {
 				return node2.get_frequency() - node1.get_frequency();
 			}
 
 		});
-		
-		//add all the words and symbols given in the collection
+
+		// add all the words and symbols given in the collection
 		allWordsAndSymbols.addAll(nodes);
-		//while the priority queue still has at least more than one keep combining them nodes
-		while(allWordsAndSymbols.size() > 1){
-			//remove the two least common words or symbols and combine them into a node
+		// while the priority queue still has at least more than one keep
+		// combining them nodes
+		while (allWordsAndSymbols.size() > 1) {
+			// remove the two least common words or symbols and combine them
+			// into a node
 			Node least = allWordsAndSymbols.remove();
 			Node secondLeast = allWordsAndSymbols.remove();
 			Node combinedNodes = new Node(null, least, secondLeast);
-			//add the combined words and/or symbols to the priority queue again
+			// add the combined words and/or symbols to the priority queue again
 			allWordsAndSymbols.add(combinedNodes);
 		}
 
-		//set the root by pulling out the only thing in the priority queue
+		// set the root by pulling out the only thing in the priority queue
 		Node root = allWordsAndSymbols.remove();
 
-		if ( VERBOSE_PRINT_TREE ) { 
-			System.out.println( root.createDot()); 
+		if (VERBOSE_PRINT_TREE) {
+			System.out.println(root.createDot());
 		}
 
 		return root;
@@ -636,8 +652,27 @@ public class HuffmanTreeUsingWords {
 	 * 
 	 */
 	private static LinkedList<Integer> determine_bit_pattern_for_symbol(Node leaf) {
-
-		return null; // FIXME
+		//keep track of current Node and the binary trace/code
+		Node currentNode = leaf;
+		LinkedList<Integer> code = new LinkedList<>();
+		
+		//while not at the root...
+		while(currentNode.get_parent() != null) {
+			//see if the current node is the left node of the parent
+			if(currentNode.get_parent().parents_left() == currentNode) {
+				//if so... add a link of zero
+				code.add(0);
+			} else {
+				//else... the current node is the right node of the parent 
+				//add a link of one
+				code.add(1);
+			}
+			//increment the current node to the parent
+			currentNode = currentNode.get_parent();
+		}
+		
+		//return the linked list of binary code
+		return code;
 	}
 
 }
