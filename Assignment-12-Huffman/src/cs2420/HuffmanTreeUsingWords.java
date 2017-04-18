@@ -272,19 +272,15 @@ public class HuffmanTreeUsingWords {
 	 * Algorithm:
 	 * 
 	 * 1) counts how often all the words appear 2) keep the N most common words
-	 * 3) re-parse the file to count all non words
-	 * 
-	 * 4) put every symbol into a Node and store this in a hash table 5) put
-	 * every symbol in order into a list for future processing
+	 * o) put every symbol into a Node and store this in a hash table
 	 *
-	 * @param infile
-	 *            - input file
+	 * @param buffer
+	 *            - list of all characters in file in order
 	 * @param count
 	 *            - find the top N (count) words
 	 * 
-	 *            WARNING: modifies the symbol hashtable
-	 * 
-	 * @return an ordered list of the symbols as they appear in the file
+	 * @return a hash table containing nodes, where each node contains the word
+	 *         and the frequency of that word
 	 * 
 	 */
 	static Hashtable<String, Node> compute_most_common_word_symbols(ArrayList<Character> buffer, int count) {
@@ -345,8 +341,13 @@ public class HuffmanTreeUsingWords {
 	}
 
 	/**
-	 * count all the symbols in the file including single characters and
-	 * predefined "word" symbols
+	 * given the list of all characters in the file, count all symbols in the
+	 * file that are not the "most frequent" word symbols (which have already
+	 * been counted). Return the hash table containing ALL nodes(symbols and
+	 * counts) for the given characters
+	 * 
+	 * ADDITIONALLY - return the ordered list of all symbols via the "out"
+	 * parameter
 	 * 
 	 * @param buffer
 	 *            - the file's characters
@@ -479,16 +480,16 @@ public class HuffmanTreeUsingWords {
 		for (Node symbol : huffman_nodes) {
 			// write the length of the symbol (to the out variable)
 			out.write(convert_integer_to_bytes(symbol.get_symbol().length()));
-			
+
 			// write the symbol itself
 			out.write(symbol.get_symbol().getBytes());
-			
+
 			// write the frequency
 			out.write(convert_integer_to_bytes(symbol.get_frequency()));
-			
+
 			// write a close 0
 			out.write(0);
-			
+
 			count++;
 		}
 
@@ -558,13 +559,13 @@ public class HuffmanTreeUsingWords {
 		}
 
 		// For each symbol in our list..
-		for(String symbol: ordered_list_of_symbols) {
+		for (String symbol : ordered_list_of_symbols) {
 			// Get the corresponding node.
 			Node symbolNode = table.get(symbol);
 			// Determine the bit pattern for the symbol.
 			LinkedList<Integer> symbolCode = determine_bit_pattern_for_symbol(symbolNode);
 			// Add each part of the code to the bitset.
-			for(Integer codePart: symbolCode) {
+			for (Integer codePart : symbolCode) {
 				bitset.set(codePart);
 			}
 		}
@@ -652,26 +653,26 @@ public class HuffmanTreeUsingWords {
 	 * 
 	 */
 	private static LinkedList<Integer> determine_bit_pattern_for_symbol(Node leaf) {
-		//keep track of current Node and the binary trace/code
+		// keep track of current Node and the binary trace/code
 		Node currentNode = leaf;
 		LinkedList<Integer> code = new LinkedList<>();
-		
-		//while not at the root...
-		while(currentNode.get_parent() != null) {
-			//see if the current node is the left node of the parent
-			if(currentNode.get_parent().parents_left() == currentNode) {
-				//if so... add a link of zero
+
+		// while not at the root...
+		while (currentNode.get_parent() != null) {
+			// see if the current node is the left node of the parent
+			if (currentNode.get_parent().parents_left() == currentNode) {
+				// if so... add a link of zero
 				code.add(0);
 			} else {
-				//else... the current node is the right node of the parent 
-				//add a link of one
+				// else... the current node is the right node of the parent
+				// add a link of one
 				code.add(1);
 			}
-			//increment the current node to the parent
+			// increment the current node to the parent
 			currentNode = currentNode.get_parent();
 		}
-		
-		//return the linked list of binary code
+
+		// return the linked list of binary code
 		return code;
 	}
 
