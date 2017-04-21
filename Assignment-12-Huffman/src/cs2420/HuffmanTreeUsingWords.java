@@ -225,14 +225,34 @@ public class HuffmanTreeUsingWords {
 			System.out.println("\n---------------- Reading encoding tree information  -----------------");
 		}
 
-		byte[] numChars = null;
-		file_bytes.get(numChars, 0, 4);
+		Hashtable<String, Node> file_header_nodes = new Hashtable<String, Node>();
+
+		// Determine length of first word.
+		int lengthOfSymbol = file_bytes.getInt();
+		// Until we reach our ending zero.
+		while (lengthOfSymbol != 0) {
+			StringBuilder symbol = new StringBuilder("");
+
+			// Based on length of next word, grab next word.
+			for (int charNum = 0; charNum < lengthOfSymbol; charNum++) {
+				symbol.append(file_bytes.get());
+			}
+
+			// Get the frequency of the word we just grabbed.
+			int frequency = file_bytes.getInt();
+
+			// Create node.
+			file_header_nodes.put(symbol.toString(), new Node(symbol.toString(), frequency));
+
+			// Determine new length of next symbol.
+			lengthOfSymbol = file_bytes.getInt();
+		}
 
 		if (VERBOSE_ENCODING_TREE) {
 			System.out.println("\n\tRead encoding table. Size:  " + file_bytes.position() + " bytes");
 		}
 
-		return null; // FIXME
+		return file_header_nodes;
 	}
 
 	/**
@@ -293,7 +313,7 @@ public class HuffmanTreeUsingWords {
 			@Override
 			public int compare(Node node1, Node node2) {
 				// Custom comparator to let the PQ use frequencies.
-				return node1.get_frequency() - node2.get_frequency();
+				return node2.get_frequency() - node1.get_frequency();
 			}
 
 		});
@@ -310,6 +330,7 @@ public class HuffmanTreeUsingWords {
 		// go through the arrayList looking at the characters and words given
 		for (int idx = 0; idx < buffer.size(); idx++) {
 			// if symbol is a space add it to the hashtable
+			// FIXME: apostrophe fix plz.
 			if (!Character.isAlphabetic(buffer.get(idx)) && buildingString.length() > 1) {
 				increment(buildingString.toString(), wordsTable);
 				buildingString = new StringBuilder("");
@@ -326,7 +347,7 @@ public class HuffmanTreeUsingWords {
 		}
 
 		// Place the N (count) most frequently used words into final hash.
-		for (int word = 0; word < count; word++) {
+		for (int word = 0; word < count && word < wordsTable.size(); word++) {
 			Node currentNode = wordsFrequencies.remove();
 			symbolsTable.put(currentNode.get_symbol(), currentNode);
 		}
@@ -430,8 +451,35 @@ public class HuffmanTreeUsingWords {
 			System.out.println("------------- Converting bit sequences back into symbols -------------------");
 		}
 
-		throw new RuntimeException("Error: did not find EOF termination character");
+		// Store words in our compressed file.
+		ArrayList<String> symbols = new ArrayList<>();
 
+		// Create a currentNode from which to find the words we're looking for.
+		Node currentNode = root;
+		
+		while (bit_stream.hasRemaining()) {
+			// Grab the next 1 or 0
+			int nextByte = bit_stream.get();
+
+			// If 1 go right, otherwise left.
+			if (nextByte == 1) {
+				currentNode = currentNode.get_right_child();
+			} else {
+				currentNode = currentNode.get_left_child();
+			}
+
+			// See if we've reached a leaf.
+			if (currentNode.leaf()) {
+				if (currentNode.get_symbol().equals(EOF)) {
+					// If end of file, break, we're done.
+					break;
+				}
+				// If we reach a leaf, add the leaf to our list of symbols.
+				symbols.add(currentNode.get_symbol());
+			}
+		}
+
+		return symbols;
 	}
 
 	/**
@@ -476,14 +524,15 @@ public class HuffmanTreeUsingWords {
 			// write the length of the symbol (to the out variable)
 			out.write(convert_integer_to_bytes(symbol.get_symbol().length()));
 
-			// write the symbol itself
+			// Write symbol's characters to the header.
 			out.write(symbol.get_symbol().getBytes());
+//			System.out.println(symbol.get_symbol().getBytes());
 
 			// write the frequency
 			out.write(convert_integer_to_bytes(symbol.get_frequency()));
 
 			// write a close 0
-			out.write(0);
+ 			out.write(0);
 
 			count++;
 		}
@@ -491,7 +540,7 @@ public class HuffmanTreeUsingWords {
 		if (VERBOSE_ENCODING_TREE) {
 			System.out.println("\n\tEncoding Table Size:  " + count + " bytes");
 		}
-
+		
 		// convert out into a byte array and return it.
 		return out.toByteArray();
 
@@ -559,6 +608,7 @@ public class HuffmanTreeUsingWords {
 			Node symbolNode = table.get(symbol);
 			// Determine the bit pattern for the symbol.
 			LinkedList<Integer> symbolCode = determine_bit_pattern_for_symbol(symbolNode);
+			//System.out.println(symbol + " " + symbolCode.toString());
 			// Add each part of the code to the bitset.
 			for (Integer codePart : symbolCode) {
 				bitset.set(codePart);
@@ -590,6 +640,7 @@ public class HuffmanTreeUsingWords {
 	 *            nodes to be built into a tree
 	 */
 	static Node create_tree(Collection<Node> nodes) {
+		int innerNodeCount = 1;
 
 		// make a priority queue that will contain the words and symbols
 		PriorityQueue<Node> allWordsAndSymbols = new PriorityQueue<>(new Comparator<Node>() {
@@ -597,7 +648,7 @@ public class HuffmanTreeUsingWords {
 			// make our own comparator so that max heap becomes a min heap
 			@Override
 			public int compare(Node node1, Node node2) {
-				return node2.get_frequency() - node1.get_frequency();
+				return node1.get_frequency() - node2.get_frequency();
 			}
 
 		});
@@ -611,7 +662,10 @@ public class HuffmanTreeUsingWords {
 			// into a node
 			Node least = allWordsAndSymbols.remove();
 			Node secondLeast = allWordsAndSymbols.remove();
-			Node combinedNodes = new Node(null, least, secondLeast);
+			Node combinedNodes = new Node("N_" + innerNodeCount, least, secondLeast);
+			least.set_parent(combinedNodes);
+			secondLeast.set_parent(combinedNodes);
+			innerNodeCount++;
 			// add the combined words and/or symbols to the priority queue again
 			allWordsAndSymbols.add(combinedNodes);
 		}
@@ -655,17 +709,19 @@ public class HuffmanTreeUsingWords {
 		// while not at the root...
 		while (currentNode.get_parent() != null) {
 			// see if the current node is the left node of the parent
-			if (currentNode.get_parent().parents_left() == currentNode) {
+			if (currentNode.parents_left() == currentNode) {
 				// if so... add a link of zero
-				code.add(0);
+				code.addFirst(0);
 			} else {
 				// else... the current node is the right node of the parent
 				// add a link of one
-				code.add(1);
+				code.addFirst(1);
 			}
 			// increment the current node to the parent
 			currentNode = currentNode.get_parent();
 		}
+		
+		System.out.println(leaf.get_symbol() + " " + code.toString());
 
 		// return the linked list of binary code
 		return code;
