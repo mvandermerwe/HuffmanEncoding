@@ -62,7 +62,12 @@ class Node implements Comparable<Node> {
 	 * concisely print the Node
 	 */
 	public String toString() {
-		return "ALLLLLLRRRRIIIIGGGHHHHTTTTT";
+		String print =  "Symbol: " + "\t" + symbol + 
+						"Left: " + "\t" + left + 
+						"Right: " + "\t" + right +  
+						"Parent: " + "\t" + parent + 
+						"Frequency: " + "\t" + frequency;
+		return print;
 	}
 
 	/**

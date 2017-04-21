@@ -13,7 +13,7 @@ public class NodeTest {
 
 	@Test
 	public void test() {
-		fail("Not yet implemented");
+		
 	}
 
 }
