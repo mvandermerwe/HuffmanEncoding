@@ -63,8 +63,6 @@ class Node implements Comparable<Node> {
 	 */
 	public String toString() {
 		String print =  "Symbol: " + "\t" + symbol + "\n" +
-//						"Left: " + "\t" + left + "\n" +
-//						"Right: " + "\t" + right +  "\n" +
 						"Parent: " + "\t" + parent + "\n" +
 						"Frequency: " + "\t" + frequency + "\n";
 		return print;
@@ -100,7 +98,10 @@ class Node implements Comparable<Node> {
 	 * @return the left child of the parent of this node
 	 */
 	public Node parents_left() {
-		return this.left;
+		if(parent == null){
+			return null;
+		}
+		return this.parent.left;
 	}
 
 	/**

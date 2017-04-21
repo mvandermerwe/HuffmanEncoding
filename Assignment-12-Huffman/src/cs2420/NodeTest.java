@@ -20,13 +20,26 @@ public class NodeTest {
 	}
 
 	@Test
-	public void testParentAndChild() {
+	public void testParentandSymbol() {
 		Node one = new Node("a", 1);
 		Node two = new Node("b", 2);
 		Node three = new Node("c", one, two);
 		
-		System.out.println(three.toString());
-
+		assertEquals(null, three.get_parent());
+		assertEquals("c", three.get_symbol());
 	}
 
+	@Test
+	public void testLeftChild() {
+		Node one = new Node("a", 1);
+		Node two = new Node("b", 2);
+		Node three = new Node("c", one, two);
+		Node four = new Node("d", 3);
+		Node five = new Node("e", three, four);
+		three.set_parent(five);
+		
+		assertEquals(three, three.parents_left());
+		assertEquals(null, five.parents_left());
+	}
+	
 }
