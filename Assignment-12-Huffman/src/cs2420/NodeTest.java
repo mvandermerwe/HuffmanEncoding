@@ -13,7 +13,9 @@ public class NodeTest {
 
 	@Test
 	public void test() {
-		
+		Node one = new Node("a", 1);
+		Node two = new Node("a", 1);
+		Node three = new Node("a", 1);
 	}
 
 }

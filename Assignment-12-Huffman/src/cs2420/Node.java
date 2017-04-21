@@ -66,7 +66,7 @@ class Node implements Comparable<Node> {
 						"Left: " + "\t" + left + "\n" +
 						"Right: " + "\t" + right +  "\n" +
 						"Parent: " + "\t" + parent + "\n" +
-						"Frequency: " + "\t" + frequency;
+						"Frequency: " + "\t" + frequency + "\n";
 		return print;
 	}
 
