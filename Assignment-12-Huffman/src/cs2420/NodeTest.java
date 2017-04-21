@@ -12,10 +12,21 @@ public class NodeTest {
 	}
 
 	@Test
-	public void test() {
+	public void testSymbolAndFreq() {
 		Node one = new Node("a", 1);
-		Node two = new Node("a", 1);
-		Node three = new Node("a", 1);
+		
+		assertEquals(one.get_symbol(), "a");
+		assertEquals(one.get_frequency(), 1);
+	}
+
+	@Test
+	public void testParentAndChild() {
+		Node one = new Node("a", 1);
+		Node two = new Node("b", 2);
+		Node three = new Node("c", one, two);
+		
+		System.out.println(three.toString());
+
 	}
 
 }
