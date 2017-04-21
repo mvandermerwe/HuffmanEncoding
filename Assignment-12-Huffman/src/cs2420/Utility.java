@@ -34,7 +34,7 @@ public final class Utility {
 	 *            - hash table containing symbol
 	 */
 	public static void increment(String symbol, Hashtable<String, Node> table) {
-		if (table.containsValue(symbol)) {
+		if (table.containsKey(symbol)) {
 			// If symbol is already in the table increment frequency
 			table.get(symbol).increment_frequency();
 		} else {

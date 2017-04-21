@@ -310,7 +310,7 @@ public class HuffmanTreeUsingWords {
 		// go through the arrayList looking at the characters and words given
 		for (int idx = 0; idx < buffer.size(); idx++) {
 			// if symbol is a space add it to the hashtable
-			if (buffer.get(idx).equals(" ")) {
+			if (!Character.isAlphabetic(buffer.get(idx)) && buildingString.length() > 1) {
 				increment(buildingString.toString(), wordsTable);
 				buildingString = new StringBuilder("");
 			} else {
@@ -329,11 +329,6 @@ public class HuffmanTreeUsingWords {
 		for (int word = 0; word < count; word++) {
 			Node currentNode = wordsFrequencies.remove();
 			symbolsTable.put(currentNode.get_symbol(), currentNode);
-		}
-
-		// add each symbol to our hash.
-		for (int idx = 0; idx < buffer.size(); idx++) {
-			increment(buffer.get(idx).toString(), symbolsTable);
 		}
 
 		return symbolsTable;
