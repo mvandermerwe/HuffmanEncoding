@@ -470,23 +470,27 @@ public class HuffmanTreeUsingWords {
 
 		while (bit_stream.hasRemaining()) {
 			// Grab the next 1 or 0
-			int nextByte = bit_stream.get();
-
-			// If 1 go right, otherwise left.
-			if (nextByte == 1) {
-				currentNode = currentNode.get_right_child();
-			} else {
-				currentNode = currentNode.get_left_child();
-			}
-
-			// See if we've reached a leaf.
-			if (currentNode.leaf()) {
-				if (currentNode.get_symbol().equals(EOF)) {
-					// If end of file, break, we're done.
-					break;
+			Byte nextByte = bit_stream.get();
+			
+			for(int index = 0; index < 8; index++) {
+				
+				// If 1 go right, otherwise left.
+				if (get_bit(nextByte, index)) {
+					currentNode = currentNode.get_right_child();
+				} else {
+					currentNode = currentNode.get_left_child();
 				}
-				// If we reach a leaf, add the leaf to our list of symbols.
-				symbols.add(currentNode.get_symbol());
+
+				// See if we've reached a leaf.
+				if (currentNode.leaf()) {
+					if (currentNode.get_symbol().equals(EOF)) {
+						// If end of file, break, we're done.
+						break;
+					}
+					// If we reach a leaf, add the leaf to our list of symbols.
+					symbols.add(currentNode.get_symbol());
+					currentNode = root;
+				}
 			}
 		}
 
