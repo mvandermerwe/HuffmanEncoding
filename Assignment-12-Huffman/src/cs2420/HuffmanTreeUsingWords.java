@@ -52,7 +52,7 @@ public class HuffmanTreeUsingWords {
 	int WORD_COUNT;
 
 	/**
-	 * For decoding, end of header file.
+	 * For decoding, end of header file in position w/in bytebuffer.
 	 */
 	private static int endOfHeader = 0;
 
@@ -252,7 +252,7 @@ public class HuffmanTreeUsingWords {
 			// Determine new length of next symbol.
 			lengthOfSymbol = file_bytes.getInt();
 		}
-		
+
 		endOfHeader = file_bytes.position();
 
 		if (VERBOSE_ENCODING_TREE) {
@@ -459,7 +459,7 @@ public class HuffmanTreeUsingWords {
 		if (VERBOSE_PRINT_SYMBOL_BITS) {
 			System.out.println("------------- Converting bit sequences back into symbols -------------------");
 		}
-		
+
 		bit_stream.position(endOfHeader);
 
 		// Store words in our compressed file.
@@ -471,9 +471,9 @@ public class HuffmanTreeUsingWords {
 		while (bit_stream.hasRemaining()) {
 			// Grab the next 1 or 0
 			Byte nextByte = bit_stream.get();
-			
-			for(int index = 0; index < 8; index++) {
-				
+
+			for (int index = 0; index < 8; index++) {
+
 				// If 1 go right, otherwise left.
 				if (get_bit(nextByte, index)) {
 					currentNode = currentNode.get_right_child();
