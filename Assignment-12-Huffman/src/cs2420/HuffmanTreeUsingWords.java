@@ -235,7 +235,7 @@ public class HuffmanTreeUsingWords {
 
 			// Based on length of next word, grab next word.
 			for (int charNum = 0; charNum < lengthOfSymbol; charNum++) {
-				symbol.append(file_bytes.get());
+				symbol.append((char) file_bytes.get());
 			}
 
 			// Get the frequency of the word we just grabbed.
@@ -331,8 +331,10 @@ public class HuffmanTreeUsingWords {
 		for (int idx = 0; idx < buffer.size(); idx++) {
 			// if symbol is a space add it to the hashtable
 			// FIXME: apostrophe fix plz.
-			if (!Character.isAlphabetic(buffer.get(idx)) && buildingString.length() > 1) {
-				increment(buildingString.toString(), wordsTable);
+			if (!Character.isAlphabetic(buffer.get(idx))) {
+				if(buildingString.length() > 1) {
+					increment(buildingString.toString(), wordsTable);
+				}
 				buildingString = new StringBuilder("");
 			} else {
 				buildingString.append(buffer.get(idx));
@@ -456,7 +458,7 @@ public class HuffmanTreeUsingWords {
 
 		// Create a currentNode from which to find the words we're looking for.
 		Node currentNode = root;
-		
+
 		while (bit_stream.hasRemaining()) {
 			// Grab the next 1 or 0
 			int nextByte = bit_stream.get();
@@ -525,22 +527,24 @@ public class HuffmanTreeUsingWords {
 			out.write(convert_integer_to_bytes(symbol.get_symbol().length()));
 
 			// Write symbol's characters to the header.
-			out.write(symbol.get_symbol().getBytes());
-//			System.out.println(symbol.get_symbol().getBytes());
+			for (char character : symbol.get_symbol().toCharArray()) {
+				out.write(character);
+			}
+			// System.out.println(symbol.get_symbol().getBytes());
 
 			// write the frequency
 			out.write(convert_integer_to_bytes(symbol.get_frequency()));
 
-			// write a close 0
- 			out.write(0);
-
 			count++;
 		}
+
+		// write a close 0
+		out.write(convert_integer_to_bytes(0));
 
 		if (VERBOSE_ENCODING_TREE) {
 			System.out.println("\n\tEncoding Table Size:  " + count + " bytes");
 		}
-		
+
 		// convert out into a byte array and return it.
 		return out.toByteArray();
 
@@ -601,6 +605,8 @@ public class HuffmanTreeUsingWords {
 			System.out.println(
 					"Building bit representation of each symbol for " + ordered_list_of_symbols.size() + " symbols");
 		}
+		
+		int index = 0;
 
 		// For each symbol in our list..
 		for (String symbol : ordered_list_of_symbols) {
@@ -608,10 +614,14 @@ public class HuffmanTreeUsingWords {
 			Node symbolNode = table.get(symbol);
 			// Determine the bit pattern for the symbol.
 			LinkedList<Integer> symbolCode = determine_bit_pattern_for_symbol(symbolNode);
-			//System.out.println(symbol + " " + symbolCode.toString());
+			// System.out.println(symbol + " " + symbolCode.toString());
 			// Add each part of the code to the bitset.
 			for (Integer codePart : symbolCode) {
-				bitset.set(codePart);
+				if(codePart == 1) {
+					bitset.set(index);
+				}
+				
+				index++;
 			}
 		}
 
@@ -720,8 +730,8 @@ public class HuffmanTreeUsingWords {
 			// increment the current node to the parent
 			currentNode = currentNode.get_parent();
 		}
-		
-		System.out.println(leaf.get_symbol() + " " + code.toString());
+
+		//System.out.println(leaf.get_symbol() + " " + code.toString());
 
 		// return the linked list of binary code
 		return code;
