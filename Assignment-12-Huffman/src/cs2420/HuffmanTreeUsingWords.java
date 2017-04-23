@@ -52,6 +52,11 @@ public class HuffmanTreeUsingWords {
 	int WORD_COUNT;
 
 	/**
+	 * For decoding, end of header file.
+	 */
+	private static int endOfHeader = 0;
+
+	/**
 	 * For a verbose account of what is going on, set these to true.
 	 */
 	static final boolean VERBOSE_ENCODING_TREE = true;
@@ -247,6 +252,8 @@ public class HuffmanTreeUsingWords {
 			// Determine new length of next symbol.
 			lengthOfSymbol = file_bytes.getInt();
 		}
+		
+		endOfHeader = file_bytes.position();
 
 		if (VERBOSE_ENCODING_TREE) {
 			System.out.println("\n\tRead encoding table. Size:  " + file_bytes.position() + " bytes");
@@ -332,7 +339,7 @@ public class HuffmanTreeUsingWords {
 			// if symbol is a space add it to the hashtable
 			// FIXME: apostrophe fix plz.
 			if (!Character.isAlphabetic(buffer.get(idx))) {
-				if(buildingString.length() > 1) {
+				if (buildingString.length() > 1) {
 					increment(buildingString.toString(), wordsTable);
 				}
 				buildingString = new StringBuilder("");
@@ -452,6 +459,8 @@ public class HuffmanTreeUsingWords {
 		if (VERBOSE_PRINT_SYMBOL_BITS) {
 			System.out.println("------------- Converting bit sequences back into symbols -------------------");
 		}
+		
+		bit_stream.position(endOfHeader);
 
 		// Store words in our compressed file.
 		ArrayList<String> symbols = new ArrayList<>();
@@ -605,7 +614,7 @@ public class HuffmanTreeUsingWords {
 			System.out.println(
 					"Building bit representation of each symbol for " + ordered_list_of_symbols.size() + " symbols");
 		}
-		
+
 		int index = 0;
 
 		// For each symbol in our list..
@@ -617,10 +626,10 @@ public class HuffmanTreeUsingWords {
 			// System.out.println(symbol + " " + symbolCode.toString());
 			// Add each part of the code to the bitset.
 			for (Integer codePart : symbolCode) {
-				if(codePart == 1) {
+				if (codePart == 1) {
 					bitset.set(index);
 				}
-				
+
 				index++;
 			}
 		}
@@ -658,7 +667,7 @@ public class HuffmanTreeUsingWords {
 			// make our own comparator so that max heap becomes a min heap
 			@Override
 			public int compare(Node node1, Node node2) {
-				return node1.get_frequency() - node2.get_frequency();
+				return node1.compareTo(node2);
 			}
 
 		});
@@ -731,7 +740,7 @@ public class HuffmanTreeUsingWords {
 			currentNode = currentNode.get_parent();
 		}
 
-		//System.out.println(leaf.get_symbol() + " " + code.toString());
+		// System.out.println(leaf.get_symbol() + " " + code.toString());
 
 		// return the linked list of binary code
 		return code;
