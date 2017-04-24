@@ -24,9 +24,9 @@ public class Timing {
 	private static final char[] letters = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o',
 			'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
 
-	//private static long timingRatio;
+	// private static long timingRatio;
 	private static long sizeRatio;
-	
+
 	public static void main(String[] args) {
 		timingRatioCalcN();
 	}
@@ -60,41 +60,67 @@ public class Timing {
 
 		// Increment through diff sizes of random files.
 		for (int numOfChars = NUMBER_OF_CHARS_PER_FILE_LOWER; numOfChars <= NUMBER_OF_CHARS_PER_FILE_UPPER; numOfChars += NUMBER_OF_CHARS_PER_FILE_INCREMENT) {
-			// No words, so we don't care about the words we keep.
-			HuffmanTreeUsingWords tree = new HuffmanTreeUsingWords(0);
-			
-			// Create the file to test on.
-			makeAFile(numOfChars);
-			
-			startTime = System.nanoTime();
-			tree.compress_file(new File(randomLettersFileName + "_" + numOfChars), new File(randomLettersFileName + "_" + numOfChars + "_compress"));
-			endTime = System.nanoTime();
-			long totalCompressTime = endTime - startTime;
+			long totalCompressTime = 0;
+			long totalDecompressTime = 0;
 
-			startTime = System.nanoTime();
-			tree.decompress_file(Paths.get(randomLettersFileName + "_" + numOfChars + "_compress"), new File(randomLettersFileName + "_" + numOfChars + "_uncompress"));
-			endTime = System.nanoTime();
-			long totalDecompressTime = endTime - startTime;
+			for (int test = 0; test < 100; test++) {
+				// No words, so we don't care about the words we keep.
+				HuffmanTreeUsingWords tree = new HuffmanTreeUsingWords(0);
 
-			//timingRatio = totalCompressTime / totalDecompressTime;
+				// Create the file to test on.
+				makeAFile(numOfChars);
+
+				startTime = System.nanoTime();
+				tree.compress_file(new File(randomLettersFileName + "_" + numOfChars),
+						new File(randomLettersFileName + "_" + numOfChars + "_compress"));
+				endTime = System.nanoTime();
+				totalCompressTime += (endTime - startTime) / 100;
+
+				startTime = System.nanoTime();
+				tree.decompress_file(Paths.get(randomLettersFileName + "_" + numOfChars + "_compress"),
+						new File(randomLettersFileName + "_" + numOfChars + "_uncompress"));
+				endTime = System.nanoTime();
+				totalDecompressTime = (endTime - startTime) / 100;
+			}
+
+			// timingRatio = totalCompressTime / totalDecompressTime;
 			// Write our compress and decompress times to a file.
 			timingForNChars.append(numOfChars + "," + totalCompressTime + "," + totalDecompressTime + "\n");
 		}
-		
+
 		sendToFile(timingForNChars, "timingInfo.csv");
 	}
 
-	public static void sizeRatioCalcN() {
-		HuffmanTreeUsingWords tree = new HuffmanTreeUsingWords(0);
-		//tree.compress_file(randomLettersFileName, randomLettersFileName);
-		// TODO get size of file
-		long compressedSize;
+	public static void compressionRatioCalcN() {
+		StringBuilder compressionForNChars = new StringBuilder();
 
-		//tree.decompress_file(Paths.get(randomLettersFileName), randomLettersFileName);
-		// TODO get size of file
-		long decompressedSize;
+		// Increment through diff sizes of random files.
+		for (int numOfChars = NUMBER_OF_CHARS_PER_FILE_LOWER; numOfChars <= NUMBER_OF_CHARS_PER_FILE_UPPER; numOfChars += NUMBER_OF_CHARS_PER_FILE_INCREMENT) {
+			long fileCompressionRatio = 0;
 
-		//sizeRatio = compressedSize / decompressedSize;
+			for (int test = 0; test < 100; test++) {
+				// No words, so we don't care about the words we keep.
+				HuffmanTreeUsingWords tree = new HuffmanTreeUsingWords(0);
+
+				// Create the file to test on.
+				makeAFile(numOfChars);
+
+				tree.compress_file(new File(randomLettersFileName + "_" + numOfChars),
+						new File(randomLettersFileName + "_" + numOfChars + "_compress"));
+
+				File compressedFile = new File(randomLettersFileName + "_" + numOfChars + "_compress");
+				File originalFile = new File(randomLettersFileName + "_" + numOfChars);
+
+				// Add the compression ratio between the compressed and original
+				// file.
+				fileCompressionRatio += (compressedFile.length() / originalFile.length()) / 100;
+			}
+
+			// Write our compress and decompress times to a file.
+			compressionForNChars.append(numOfChars + "," + fileCompressionRatio + "\n");
+		}
+
+		sendToFile(compressionForNChars, "compressionInfo.csv");
 	}
 
 	/**
