@@ -48,11 +48,11 @@ public class Main {
 		// test code
 
 		huffman = new HuffmanTreeUsingWords(8);
-		compress = false;
+		compress = true;
 		file_name = "Resources/two_cities";
 		// file_name = "Resources\\constitution";
 		// file_name = "Resources\\green_eggs_and_ham";
-		// file_name = "Resources\\alphabetplus";
+		//file_name = "Resources/alphabetplus";
 		//file_name = "Resources/alphabet";
 		//file_name = "Resources/simple";
 		//file_name = "Resources/a_few_letters";
