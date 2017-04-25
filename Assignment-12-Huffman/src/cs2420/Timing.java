@@ -27,10 +27,10 @@ public class Timing {
 			'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
 
 	public static void main(String[] args) {
-		timingRatioCalcN();
-		compressionRatioCalcN();
+		//timingRatioCalcN();
+		//compressionRatioCalcN();
 		timingOnNWordsKept();
-		compressionOnNWordsKept();
+		//compressionOnNWordsKept();
 	}
 
 	/**
@@ -146,11 +146,11 @@ public class Timing {
 				HuffmanTreeUsingWords tree = new HuffmanTreeUsingWords(numOfWords);
 
 				// We will use the tale of two cities as our test file.
-				startTime = System.nanoTime();
-				tree.compress_file(new File("Resources/two_cities"),
-						new File("Resources/timeNWords/two_cities_" + numOfWords));
-				endTime = System.nanoTime();
-				timeCompressForNWords += (endTime - startTime) / TESTS;
+//				startTime = System.nanoTime();
+//				tree.compress_file(new File("Resources/two_cities"),
+//						new File("Resources/timeNWords/two_cities_" + numOfWords));
+//				endTime = System.nanoTime();
+//				timeCompressForNWords += (endTime - startTime) / TESTS;
 
 				startTime = System.nanoTime();
 				tree.decompress_file(Paths.get("Resources/timeNWords/two_cities_" + numOfWords),

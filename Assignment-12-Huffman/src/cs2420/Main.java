@@ -48,7 +48,7 @@ public class Main {
 		// test code
 
 		huffman = new HuffmanTreeUsingWords(8);
-		compress = true;
+		compress = false;
 		file_name = "Resources/two_cities";
 		// file_name = "Resources\\constitution";
 		// file_name = "Resources\\green_eggs_and_ham";
