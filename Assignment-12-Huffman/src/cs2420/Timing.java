@@ -13,8 +13,10 @@ public class Timing {
 	private static final int WORD_COUNT_INCREMENT = 50;
 
 	private static final int NUMBER_OF_CHARS_PER_FILE_LOWER = 0;
-	private static final int NUMBER_OF_CHARS_PER_FILE_UPPER = 1_000_000;
+	private static final int NUMBER_OF_CHARS_PER_FILE_UPPER = 1_000_001;
 	private static final int NUMBER_OF_CHARS_PER_FILE_INCREMENT = 50_000;
+
+	private static final int TESTS = 20;
 
 	private static long startTime;
 	private static long endTime;
@@ -24,11 +26,11 @@ public class Timing {
 	private static final char[] letters = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o',
 			'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
 
-	// private static long timingRatio;
-	private static long sizeRatio;
-
 	public static void main(String[] args) {
 		timingRatioCalcN();
+		compressionRatioCalcN();
+		timingOnNWordsKept();
+		compressionOnNWordsKept();
 	}
 
 	/**
@@ -60,10 +62,13 @@ public class Timing {
 
 		// Increment through diff sizes of random files.
 		for (int numOfChars = NUMBER_OF_CHARS_PER_FILE_LOWER; numOfChars <= NUMBER_OF_CHARS_PER_FILE_UPPER; numOfChars += NUMBER_OF_CHARS_PER_FILE_INCREMENT) {
+
 			long totalCompressTime = 0;
 			long totalDecompressTime = 0;
 
-			for (int test = 0; test < 100; test++) {
+			for (int test = 0; test < TESTS; test++) {
+				System.out.println("Starting test " + test + " for " + numOfChars);
+
 				// No words, so we don't care about the words we keep.
 				HuffmanTreeUsingWords tree = new HuffmanTreeUsingWords(0);
 
@@ -74,13 +79,13 @@ public class Timing {
 				tree.compress_file(new File(randomLettersFileName + "_" + numOfChars),
 						new File(randomLettersFileName + "_" + numOfChars + "_compress"));
 				endTime = System.nanoTime();
-				totalCompressTime += (endTime - startTime) / 100;
+				totalCompressTime += (endTime - startTime) / TESTS;
 
 				startTime = System.nanoTime();
 				tree.decompress_file(Paths.get(randomLettersFileName + "_" + numOfChars + "_compress"),
 						new File(randomLettersFileName + "_" + numOfChars + "_uncompress"));
 				endTime = System.nanoTime();
-				totalDecompressTime = (endTime - startTime) / 100;
+				totalDecompressTime = (endTime - startTime) / TESTS;
 			}
 
 			// timingRatio = totalCompressTime / totalDecompressTime;
@@ -88,17 +93,21 @@ public class Timing {
 			timingForNChars.append(numOfChars + "," + totalCompressTime + "," + totalDecompressTime + "\n");
 		}
 
-		sendToFile(timingForNChars, "timingInfo.csv");
+		sendToFile(timingForNChars, "timingInfoNChars.csv");
 	}
 
 	public static void compressionRatioCalcN() {
 		StringBuilder compressionForNChars = new StringBuilder();
 
-		// Increment through diff sizes of random files.
-		for (int numOfChars = NUMBER_OF_CHARS_PER_FILE_LOWER; numOfChars <= NUMBER_OF_CHARS_PER_FILE_UPPER; numOfChars += NUMBER_OF_CHARS_PER_FILE_INCREMENT) {
-			long fileCompressionRatio = 0;
+		// Increment through diff sizes of random files. Note add one to avoid
+		// divide by zero.
+		for (int numOfChars = NUMBER_OF_CHARS_PER_FILE_LOWER + 1; numOfChars <= NUMBER_OF_CHARS_PER_FILE_UPPER; numOfChars += NUMBER_OF_CHARS_PER_FILE_INCREMENT) {
+			double fileCompressionRatio = 0;
+			long fileCompressedSize = 0;
 
-			for (int test = 0; test < 100; test++) {
+			for (int test = 0; test < TESTS; test++) {
+				System.out.println("Starting test " + test + " for " + numOfChars);
+
 				// No words, so we don't care about the words we keep.
 				HuffmanTreeUsingWords tree = new HuffmanTreeUsingWords(0);
 
@@ -113,14 +122,69 @@ public class Timing {
 
 				// Add the compression ratio between the compressed and original
 				// file.
-				fileCompressionRatio += (compressedFile.length() / originalFile.length()) / 100;
+				fileCompressionRatio += ((double) compressedFile.length() /(double) originalFile.length()) /(double) TESTS;
+				fileCompressedSize = compressedFile.length();
 			}
 
 			// Write our compress and decompress times to a file.
-			compressionForNChars.append(numOfChars + "," + fileCompressionRatio + "\n");
+			compressionForNChars.append(numOfChars + "," + fileCompressionRatio + "," + fileCompressedSize + "\n");
 		}
 
-		sendToFile(compressionForNChars, "compressionInfo.csv");
+		sendToFile(compressionForNChars, "compressionInfoNChars.csv");
+	}
+
+	public static void timingOnNWordsKept() {
+		StringBuilder timingNWords = new StringBuilder();
+
+		for (int numOfWords = WORD_COUNT_LOWER; numOfWords <= WORD_COUNT_UPPER; numOfWords += WORD_COUNT_INCREMENT) {
+			long timeCompressForNWords = 0;
+			long timeDecompressForNWords = 0;
+
+			for (int test = 0; test < TESTS; test++) {
+				System.out.println("Starting test " + test + " for " + numOfWords);
+
+				HuffmanTreeUsingWords tree = new HuffmanTreeUsingWords(numOfWords);
+
+				// We will use the tale of two cities as our test file.
+				startTime = System.nanoTime();
+				tree.compress_file(new File("Resources/two_cities"),
+						new File("Resources/timeNWords/two_cities_" + numOfWords));
+				endTime = System.nanoTime();
+				timeCompressForNWords += (endTime - startTime) / TESTS;
+
+				startTime = System.nanoTime();
+				tree.decompress_file(Paths.get("Resources/timeNWords/two_cities_" + numOfWords),
+						new File("Resources/timeNWords/two_cities_" + numOfWords + "_uncompress"));
+				endTime = System.nanoTime();
+				timeDecompressForNWords += (endTime - startTime) / TESTS;
+			}
+
+			timingNWords.append(numOfWords + "," + timeCompressForNWords + "," + timeDecompressForNWords + "\n");
+		}
+
+		sendToFile(timingNWords, "timingInfoNWords.csv");
+	}
+
+	public static void compressionOnNWordsKept() {
+		StringBuilder compressionNWords = new StringBuilder();
+
+		for (int numOfWords = WORD_COUNT_LOWER; numOfWords <= WORD_COUNT_UPPER; numOfWords += WORD_COUNT_INCREMENT) {
+
+			System.out.println("Starting test for " + numOfWords);
+			HuffmanTreeUsingWords tree = new HuffmanTreeUsingWords(numOfWords);
+
+			// We will use the tale of two cities as our test file.
+			tree.compress_file(new File("Resources/two_cities"),
+					new File("Resources/timeNWords/two_cities_" + numOfWords));
+
+			long originalSize = new File("Resources/two_cities").length();
+			long compressedSize = new File("Resources/timeNWords/two_cities_" + numOfWords).length();
+
+			double compressionRatio = (double) compressedSize / (double) originalSize;
+			compressionNWords.append(numOfWords + "," + compressionRatio + "," + compressedSize + "\n");
+		}
+
+		sendToFile(compressionNWords, "compressionInfoNWords.csv");
 	}
 
 	/**

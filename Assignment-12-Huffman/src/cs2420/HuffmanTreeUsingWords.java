@@ -59,10 +59,10 @@ public class HuffmanTreeUsingWords {
 	/**
 	 * For a verbose account of what is going on, set these to true.
 	 */
-	static final boolean VERBOSE_ENCODING_TREE = true;
-	static final boolean VERBOSE_FILE_SIZE = true;
-	static final boolean VERBOSE_PRINT_SYMBOL_BITS = true;
-	static final boolean VERBOSE_PRINT_TREE = true;
+	static final boolean VERBOSE_ENCODING_TREE = false;
+	static final boolean VERBOSE_FILE_SIZE = false;
+	static final boolean VERBOSE_PRINT_SYMBOL_BITS = false;
+	static final boolean VERBOSE_PRINT_TREE = false;
 
 	/**
 	 * The root of the Huffman tree
