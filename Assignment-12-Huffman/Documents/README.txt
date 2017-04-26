@@ -47,4 +47,4 @@
 	
  Our biggest problem was understanding the code and what it did. Another problem we encountered was
  using bytes instead of bits and vice versa. It caused lots of problems when building our trees 
- but with lots of debugging we were able to figure out were the problem was. 
+ but with lots of debugging we were able to figure out where the problem was. 
