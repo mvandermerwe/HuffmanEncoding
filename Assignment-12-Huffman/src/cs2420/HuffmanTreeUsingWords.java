@@ -337,7 +337,6 @@ public class HuffmanTreeUsingWords {
 		// go through the arrayList looking at the characters and words given
 		for (int idx = 0; idx < buffer.size(); idx++) {
 			// if symbol is a space add it to the hashtable
-			// FIXME: apostrophe fix plz.
 			if (!Character.isAlphabetic(buffer.get(idx))) {
 				if (buildingString.length() > 1) {
 					increment(buildingString.toString(), wordsTable);

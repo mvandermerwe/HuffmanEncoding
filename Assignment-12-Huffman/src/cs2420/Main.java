@@ -3,6 +3,10 @@ package cs2420;
 import java.io.File;
 import java.nio.file.Paths;
 
+/**
+ * Perform compression or decompression on a file, either in Eclipse or from the
+ * command line.
+ */
 public class Main {
 	/**
 	 * compress or uncompress a file
@@ -52,11 +56,11 @@ public class Main {
 		file_name = "Resources/two_cities";
 		// file_name = "Resources\\constitution";
 		// file_name = "Resources\\green_eggs_and_ham";
-		//file_name = "Resources/alphabetplus";
-		//file_name = "Resources/alphabet";
-		//file_name = "Resources/simple";
-		//file_name = "Resources/a_few_letters";
-		//file_name = "Resources/";
+		// file_name = "Resources/alphabetplus";
+		// file_name = "Resources/alphabet";
+		// file_name = "Resources/simple";
+		// file_name = "Resources/a_few_letters";
+		// file_name = "Resources/";
 
 		if (!compress) {
 			file_name += "." + huffman.WORD_COUNT;

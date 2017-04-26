@@ -16,8 +16,11 @@ import java.util.List;
 import org.junit.Test;
 
 /**
- * @author markvandermerwe
- *
+ * Testing of public functions in Huffman Tree. Note all not present are
+ * implicitly tested either through this or verifiably through confirmation of
+ * successful decompression.
+ * 
+ * @author Mark Van der Merwe and Anastasia Gonzalez
  */
 public class HuffmanTreeUsingWordsTest {
 

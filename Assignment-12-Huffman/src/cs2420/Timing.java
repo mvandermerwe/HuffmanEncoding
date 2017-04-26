@@ -6,16 +6,24 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Random;
 
+/**
+ * Timing and compression analysis for our Huffman tree.
+ * 
+ * @author Mark Van der Merwe and Anastasia Gonzalez
+ */
 public class Timing {
 
+	// Count of N words to test on.
 	private static final int WORD_COUNT_LOWER = 0;
 	private static final int WORD_COUNT_UPPER = 1_000;
 	private static final int WORD_COUNT_INCREMENT = 50;
 
+	// Count of chars to test on.
 	private static final int NUMBER_OF_CHARS_PER_FILE_LOWER = 0;
 	private static final int NUMBER_OF_CHARS_PER_FILE_UPPER = 1_000_001;
 	private static final int NUMBER_OF_CHARS_PER_FILE_INCREMENT = 50_000;
 
+	// Number of tests to run on each.
 	private static final int TESTS = 20;
 
 	private static long startTime;
@@ -26,11 +34,14 @@ public class Timing {
 	private static final char[] letters = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o',
 			'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
 
+	/**
+	 * Run the tests. Uncomment/comment at will!!
+	 */
 	public static void main(String[] args) {
-		//timingRatioCalcN();
-		//compressionRatioCalcN();
+		// timingRatioCalcN();
+		// compressionRatioCalcN();
 		timingOnNWordsKept();
-		//compressionOnNWordsKept();
+		// compressionOnNWordsKept();
 	}
 
 	/**
@@ -55,7 +66,8 @@ public class Timing {
 	}
 
 	/**
-	 * 
+	 * Perform timing analysis on compression and decompression when changing
+	 * the N number of characters in a given file.
 	 */
 	public static void timingRatioCalcN() {
 		StringBuilder timingForNChars = new StringBuilder();
@@ -96,12 +108,19 @@ public class Timing {
 		sendToFile(timingForNChars, "timingInfoNChars.csv");
 	}
 
+	/**
+	 * Perform Compression analysis on compression when changing the N number of
+	 * characters in a given file. Compression analysis performed by saving the
+	 * compressed file size and the compression ratio, which is determined by
+	 * dividing the compressed file size by the original file size.
+	 */
 	public static void compressionRatioCalcN() {
 		StringBuilder compressionForNChars = new StringBuilder();
 
 		// Increment through diff sizes of random files. Note add one to avoid
 		// divide by zero.
-		for (int numOfChars = NUMBER_OF_CHARS_PER_FILE_LOWER + 1; numOfChars <= NUMBER_OF_CHARS_PER_FILE_UPPER; numOfChars += NUMBER_OF_CHARS_PER_FILE_INCREMENT) {
+		for (int numOfChars = NUMBER_OF_CHARS_PER_FILE_LOWER
+				+ 1; numOfChars <= NUMBER_OF_CHARS_PER_FILE_UPPER; numOfChars += NUMBER_OF_CHARS_PER_FILE_INCREMENT) {
 			double fileCompressionRatio = 0;
 			long fileCompressedSize = 0;
 
@@ -122,7 +141,8 @@ public class Timing {
 
 				// Add the compression ratio between the compressed and original
 				// file.
-				fileCompressionRatio += ((double) compressedFile.length() /(double) originalFile.length()) /(double) TESTS;
+				fileCompressionRatio += ((double) compressedFile.length() / (double) originalFile.length())
+						/ (double) TESTS;
 				fileCompressedSize = compressedFile.length();
 			}
 
@@ -133,6 +153,9 @@ public class Timing {
 		sendToFile(compressionForNChars, "compressionInfoNChars.csv");
 	}
 
+	/**
+	 * Timing analysis on keeping N words in the Huffman tree.
+	 */
 	public static void timingOnNWordsKept() {
 		StringBuilder timingNWords = new StringBuilder();
 
@@ -146,11 +169,11 @@ public class Timing {
 				HuffmanTreeUsingWords tree = new HuffmanTreeUsingWords(numOfWords);
 
 				// We will use the tale of two cities as our test file.
-//				startTime = System.nanoTime();
-//				tree.compress_file(new File("Resources/two_cities"),
-//						new File("Resources/timeNWords/two_cities_" + numOfWords));
-//				endTime = System.nanoTime();
-//				timeCompressForNWords += (endTime - startTime) / TESTS;
+				// startTime = System.nanoTime();
+				// tree.compress_file(new File("Resources/two_cities"),
+				// new File("Resources/timeNWords/two_cities_" + numOfWords));
+				// endTime = System.nanoTime();
+				// timeCompressForNWords += (endTime - startTime) / TESTS;
 
 				startTime = System.nanoTime();
 				tree.decompress_file(Paths.get("Resources/timeNWords/two_cities_" + numOfWords),
@@ -165,6 +188,11 @@ public class Timing {
 		sendToFile(timingNWords, "timingInfoNWords.csv");
 	}
 
+	/**
+	 * Compression ratio testing for keeping N words in the tree. Compression is
+	 * represented in the same way as it is for our N chars compression analysis
+	 * so see above for details.
+	 */
 	public static void compressionOnNWordsKept() {
 		StringBuilder compressionNWords = new StringBuilder();
 
